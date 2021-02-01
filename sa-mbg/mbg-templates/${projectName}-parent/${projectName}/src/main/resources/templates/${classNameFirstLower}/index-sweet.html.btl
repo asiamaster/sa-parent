@@ -1,0 +1,455 @@
+ ${"<#"}body>
+    <div class="easyui-layout" fit="true">
+        <!-- ====================================================================================================================== -->
+        <!-- 上方布局 -->
+        <!-- ====================================================================================================================== -->
+        <div region="north" height="auto" align="center" border="false">
+            <!-- =========================================================表单========================================================= -->
+            <div class="easyui-panel" style="width:100%;" align="left">
+                <form id="form" class="easyui-form" method="post" fit="true">
+                    <table style="padding:10px;">
+                    <%
+                     //列索引
+                    var columnIndex = 0;
+                    //总列数
+                    var COLUMN_COUNT = 5;
+                    //获取一个非主键的第一个字段作为表格排序列和表单的focus字段
+                    var firstField = table.allColumns[0];
+                    for(var i=0; i<table.allColumns.~size;i++){//for start
+                        var field = table.allColumns[i];
+                        //主键直接跳过
+                        if(field.identity==true){
+                            continue;
+                        }
+                        firstField = field;
+                        break;
+                    }
+                    for(var i=0; i<table.allColumns.~size;i++){//for start
+                        var field = table.allColumns[i];
+                        //主键直接跳过
+                        if(field.identity==true){
+                            continue;
+                        }
+                        //COLUMN_COUNT列换行
+                        if(columnIndex%COLUMN_COUNT == 0){
+                        %>
+                        <tr>
+                        <%}%>
+                            <td style="padding:5px;">
+                                <%
+                                //初始化数据
+                                var jsonObject = @BeetlTemplateUtil.getJsonObject(field.remarks);
+                                var fieldName = @BeetlTemplateUtil.getFieldName(field.remarks);
+                                //没有注释则直接使用javaProperty
+                                fieldName = (fieldName == null || fieldName=="") ? field.javaProperty :fieldName;
+                                var comment = @BeetlTemplateUtil.getComment(field.remarks);
+                                //注释中有JSON参数，则处理成下拉框
+                                if( jsonObject!=null){
+                                    var data = jsonObject["data"];
+                                    var provider = jsonObject["provider"];
+                                    var valueField = jsonObject["valueField"];
+                                    var textField = jsonObject["textField"];
+                                    var tableName = jsonObject["table"];
+                                    var orderByClause = jsonObject["orderByClause"];
+                                    var queryParams = jsonObject["queryParams"];
+                                    %>
+                                    <input name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%;" editable="false" labelAlign="right" panelWidth="auto" panelHeight="auto" label="${fieldName!}:"/>
+                                    <%
+                                    //优先解析provider，如果有data，则会在provider插件中生成后台的Provider类
+                                    if(provider != null && provider!=""){
+                                        provider = strutil.toLowerCase(strutil.subStringTo(provider, 0, 1))+strutil.subString(provider,1);
+                                    %>
+                                    ${"<#"}comboProvider _id="${field.javaProperty}" _provider='${provider}'/>
+                                    <%
+                                    //有直接的json数据
+                                    }else if(data != null && data!=""){
+                                        @data.add(0, {value:null, text:"-- 请选择 --"});
+                                    %>
+                                ${"<#"}comboProvider _id="${field.javaProperty}" _data='${data}'/>
+                                    <%}else{ //没有json则解析表信息 %>
+                                ${"<#"}comboProvider _id="${field.javaProperty}" _table="${tableName}" _valueField="${valueField}" _textField="${textField}" _orderByClause="${orderByClause}" _queryParams='${queryParams}'/>
+                                    <%
+                                    }
+                                }else{ //没有JSON参数则直接按字段类型来显示控件
+                                    if(field.jdbcTypeName=="TIMESTAMP"){
+                                    %>
+                                <input class="easyui-datetimebox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" labelAlign="right" data-options="label:'${fieldName!}:'" />
+                                    <%}else if(field.jdbcTypeName=="DATE"){%>
+                                <input class="easyui-datebox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" labelAlign="right" data-options="label:'${fieldName!}:'" />
+                                    <%}else if(field.jdbcTypeName=="INTEGER" || field.jdbcTypeName=="BIGINT"){%>
+                                <input class="easyui-numberbox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" labelAlign="right" data-options="label:'${fieldName!}:', validType:'length[0,${field.length}]'" />
+                                    <%}else if(field.jdbcTypeName=="BIT"){%>
+                                <input class="easyui-numberbox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" labelAlign="right" data-options="label:'${fieldName!}:', validType:'length[0,1]'" <% if(field.nullable == false){ %>
+                                    required="true" <%}%>/>
+                                    <%}else{%>
+                                <input class="easyui-textbox" name="${field.javaProperty}" id="${field.javaProperty}" style="width:100%" labelAlign="right" data-options="label:'${fieldName!}:', validType:'length[0,${field.length}]'" />
+                                    <%}%>
+                                <%}%>
+
+                            </td>
+                        <%
+                        if(columnIndex!=0 && ((columnIndex+1)%COLUMN_COUNT == 0 || i == table.allColumns.~size-1)){ %>
+                        </tr>
+                        <%}
+                        columnIndex++;
+                        } //for end%>
+                        <tr>
+                            <td style="padding-left:28px;padding-top: 10px; padding-bottom: 10px;">
+                                <a href="#" class="easyui-linkbutton" iconCls="icon-search" id="queryBtn"
+                                   onclick="queryGrid()">查询</a>&nbsp;&nbsp;
+                                <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-clear" onclick="clearForm()">清除</a>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+        <!-- ====================================================================================================================== -->
+        <!-- 中央布局 -->
+        <!-- ====================================================================================================================== -->
+        <!-- 表格 -->
+        <div region="center" style="width:100%;" height="auto">
+            <!-- =========================================================表格========================================================= -->
+            <table class="easyui-datagrid" title="${className}列表" id="grid" fitColumns="true" noheader="true"
+                   pagination="true" pageSize="30" pageNumber="1" pagePosition="top" rownumbers="false" remoteSort="false"
+                   loadMsg="数据加载中..." singleSelect="true" method="post" multiSort="false" sortName="${firstField.javaProperty}"
+                   align="center" fit="true" striped="true" idField="id" data-options="onDblClickRow:openUpdate, onHeaderContextMenu:headerContextMenu">
+                <thead>
+                    <tr>
+                    <%
+                    for(var i=0; i<table.allColumns.~size;i++){//for start
+                          var field = table.allColumns[i];
+                          //主键直接跳过
+                          if(field.identity==true){
+                              continue;
+                          }
+                          //初始化数据
+                          var jsonObject = @BeetlTemplateUtil.getJsonObject(field.remarks);
+                          var fieldName = @BeetlTemplateUtil.getFieldName(field.remarks);
+                          //没有注释则直接使用javaProperty
+                          fieldName = (fieldName == null || fieldName=="") ? field.javaProperty :fieldName;
+                          var provider = null;
+                          var attr = "";
+                          if(field.jdbcTypeName=="DATE"){
+                            provider = "dateProvider";
+                          }else if(field.jdbcTypeName=="TIMESTAMP"){
+                            provider = "datetimeProvider";
+                          } else if(jsonObject!=null){ //注释中有JSON参数，则处理显示值
+                                var data = jsonObject["data"];
+                                provider = jsonObject["provider"];
+                                var valueField = jsonObject["valueField"];
+                                var textField = jsonObject["textField"];
+                                var tableName = jsonObject["table"];
+                                var queryParams = jsonObject["queryParams"];
+                                //优先处理provider(有provider，这里不在attr变量中处理，仅赋值，交由下面th标签的if语句中处理)
+                                if(provider != null && provider != ""){
+                                    provider = strutil.toLowerCase(strutil.subStringTo(provider, 0, 1))+strutil.subString(provider,1);
+                                }//有直接的json数据
+                                else if(data != null && data!=""){
+                                    attr = "_data:"+strutil.replace(data+"","\"","'")+",";
+                                }else{ //没有json则解析表信息
+                                    attr = "_table:'"+tableName+"',_valueField:'"+valueField+"',_textField:'"+textField+"',_queryParams:"+ strutil.replace(queryParams+"","\"","'")+",";
+                                }
+                          }
+                    %>
+                        <th data-options="field:'${field.javaProperty}', ${attr} <%if(provider!=null){%>_provider:'${provider}',<%}%> sortable:true, order:'asc', align:'center', resizable:'true', fixed:'false'">
+                            ${fieldName}
+                        </th>
+                    <%
+                    }//for end%>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <!-- 隐藏编辑框 -->
+    <div id="dlg" class="easyui-dialog" resizable="false" constrain="true" shadow="true" draggable="false" title="${className}信息" style="padding:20px" modal="true" border="thin" closed="true"
+         data-options="
+				iconCls: 'icon-save',
+				height: 480,
+				buttons: [{
+					text:'确认',
+					iconCls:'icon-ok',
+					handler:saveOrUpdate
+				},{
+					text:'取消',
+					iconCls:'icon-cancel',
+					handler:function(){
+						$('#dlg').dialog('close');
+					}
+				}]
+			">
+    <form id="_form" class="easyui-form" method="post" fit="true">
+        <input name="_id" id="_id" type="hidden">
+        <table width="360px">
+        <%
+         //记录列数
+        columnIndex = 0;
+        for(var i=0; i<table.allColumns.~size;i++){//for start
+            var field = table.allColumns[i];
+            //主键直接跳过
+            if(field.identity==true){
+                continue;
+            }
+            //COLUMN_COUNT列换行
+            /*if(columnIndex%COLUMN_COUNT == 0){ */
+            %>
+            <tr>
+            <%/*}*/%>
+                <td style="padding:5px;">
+                    <%
+                    //初始化数据
+                    var jsonObject = @BeetlTemplateUtil.getJsonObject(field.remarks);
+                    var fieldName = @BeetlTemplateUtil.getFieldName(field.remarks);
+                    //没有注释则直接使用javaProperty
+                    fieldName = (fieldName == null || fieldName=="") ? field.javaProperty :fieldName;
+                    var comment = @BeetlTemplateUtil.getComment(field.remarks);
+                    //注释中有JSON参数，则处理成下拉框
+                    if( jsonObject!=null){
+                        var data = jsonObject["data"];
+                        var provider = jsonObject["provider"];
+                        var valueField = jsonObject["valueField"];
+                        var textField = jsonObject["textField"];
+                        var tableName = jsonObject["table"];
+                        var orderByClause = jsonObject["orderByClause"];
+                        var queryParams = jsonObject["queryParams"];
+                       %>
+                       <input name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%;" editable="false" panelWidth="auto" panelHeight="auto" label="${fieldName!}:" <% if(field.nullable == false){ %> required="true" <%}%>/>
+                       <%
+                       //优先解析provider，如果有data，则会在provider插件中生成后台的Provider类
+                       if(provider != null && provider!=""){
+                       provider = strutil.toLowerCase(strutil.subStringTo(provider, 0, 1))+strutil.subString(provider,1);
+                       %>
+                       ${"<#"}comboProvider _id="_${field.javaProperty}" _provider='${provider}'/>
+                       <%
+                       //有直接的json数据
+                       }else if(data != null && data!=""){
+                            @data.add(0, {value:null, text:"-- 请选择 --"});
+                        %>
+                    ${"<#"}comboProvider _id="_${field.javaProperty}" _data='${data}'/>
+                        <%}else{ //没有json则解析表信息 %>
+                    ${"<#"}comboProvider _id="_${field.javaProperty}" _table="${tableName}" _valueField="${valueField}" _textField="${textField}" _orderByClause="${orderByClause}" _queryParams='${queryParams}'/>
+                        <%
+                        }
+                    }else{ //没有JSON参数则直接按字段类型来显示控件
+                        if(field.jdbcTypeName=="TIMESTAMP"){
+                        %>
+                    <input class="easyui-datetimebox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" editable="false" data-options="label:'${fieldName!}:'" <% if(field.nullable == false){ %>
+                        required="true" <%}%>/>
+                        <%}else if(field.jdbcTypeName=="DATE"){%>
+                    <input class="easyui-datebox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" editable="false" data-options="label:'${fieldName!}:'" <% if(field.nullable == false){ %>
+                        required="true" <%}%>/>
+                        <%}else if(field.jdbcTypeName=="INTEGER" || field.jdbcTypeName=="BIGINT"){%>
+                    <input class="easyui-numberbox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:'" <% if(field.nullable == false){ %>
+                        required="true" <%}%>/>
+                        <%}else if(field.jdbcTypeName=="BIT"){%>
+                    <input class="easyui-numberbox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:', validType:'length[0,1]'" <% if(field.nullable == false){ %>
+                        required="true" <%}%>/>
+                        <%}else{%>
+                    <input class="easyui-textbox" name="_${field.javaProperty}" id="_${field.javaProperty}" style="width:100%" data-options="label:'${fieldName!}:', validType:'length[0,${field.length}]'" <% if(field.nullable == false){ %>
+                        required="true" <%}%>/>
+                        <%}%>
+                    <%}%>
+
+                </td>
+            <%
+            /*if(columnIndex!=0 && ((columnIndex+1)%COLUMN_COUNT == 0 || i == table.allColumns.~size-1)){  */
+            %>
+            </tr>
+            <%/*}
+            columnIndex++;*/
+            } //for end%>
+        </table>
+    </form>
+
+    </div>
+    <!-- ====================================================================================================================== -->
+    <!-- style & script 分隔线 -->
+    <!-- ====================================================================================================================== -->
+    <script type="text/javascript">
+        //打开新增窗口
+        function openInsert(){
+            $('#dlg').dialog('open');
+            $('#dlg').dialog('center');
+            $('#_form').form('clear');
+            formFocus("_form", "_${firstField.javaProperty}");
+        }
+
+        //打开修改窗口
+        function openUpdate(){
+            var selected = $("#grid").datagrid("getSelected");
+            if (null == selected) {
+                swal('警告','请选中一条数据', 'warning');
+                return;
+            }
+            $('#dlg').dialog('open');
+            $('#dlg').dialog('center');
+            formFocus("_form", "_${firstField.javaProperty}");
+            var formData = $.extend({},selected);
+            formData = addKeyStartWith(getOriginalData(formData),"_");
+            $('#_form').form('load', formData);
+        }
+
+        function saveOrUpdate(){
+            if(!$('#_form').form("validate")){
+                return;
+            }
+            var _formData = removeKeyStartWith($("#_form").serializeObject(),"_");
+            var _url = null;
+            //没有id就新增
+            if(_formData.id == null || _formData.id==""){
+                _url = "\${contextPath}/${classNameFirstLower}/insert.action";
+            }else{//有id就修改
+                _url = "\${contextPath}/${classNameFirstLower}/update.action";
+            }
+            $.ajax({
+                type: "POST",
+                url: _url,
+                data: _formData,
+                processData:true,
+                dataType: "json",
+                async : true,
+                success: function (data) {
+                    if(data.code=="200"){
+                        $("#grid").datagrid("reload");
+                        $('#dlg').dialog('close');
+                    }else{
+                        swal('错误',data.message, 'error');
+                    }
+                },
+                error: function(){
+                    swal('错误', '远程访问失败', 'error');
+                }
+            });
+        }
+
+        //根据主键删除
+        function del() {
+            var selected = $("#grid").datagrid("getSelected");
+            if (null == selected) {
+                swal('警告','请选中一条数据', 'warning');
+                return;
+            }
+            ${"<#"}swalConfirm swalTitle="您确认想要删除记录吗？">
+                    $.ajax({
+                        type: "POST",
+                        url: "\${contextPath}/${classNameFirstLower}/delete.action",
+                        data: {id:selected.id},
+                        processData:true,
+                        dataType: "json",
+                        async : true,
+                        success: function (data) {
+                            if(data.code=="200"){
+                                $("#grid").datagrid("reload");
+                                $('#dlg').dialog('close');
+                            }else{
+                                swal('错误',data.message, 'error');
+                            }
+                        },
+                        error: function(){
+                            swal('错误', '远程访问失败', 'error');
+                        }
+                    });
+            ${"</#"}swalConfirm>
+        }
+        //表格查询
+        function queryGrid() {
+            var opts = $("#grid").datagrid("options");
+            if (null == opts.url || "" == opts.url) {
+                opts.url = "\${contextPath}/${classNameFirstLower}/listPage.action";
+            }
+            if(!$('#form').form("validate")){
+                return;
+            }
+            $("#grid").datagrid("load", bindGridMeta2Form("grid", "form"));
+        }
+
+
+        //清空表单
+        function clearForm() {
+            $('#form').form('clear');
+        }
+
+        //表格表头右键菜单
+        function headerContextMenu(e, field){
+            e.preventDefault();
+            if (!cmenu){
+                createColumnMenu("grid");
+            }
+            cmenu.menu('show', {
+                left:e.pageX,
+                top:e.pageY
+            });
+        }
+
+        //全局按键事件
+        function getKey(e){
+            e = e || window.event;
+            var keycode = e.which ? e.which : e.keyCode;
+            if(keycode == 46){ //如果按下删除键
+                var selected = $("#grid").datagrid("getSelected");
+                if(selected && selected!= null){
+                    del();
+                }
+            }
+        }
+
+        /**
+         * 绑定页面回车事件，以及初始化页面时的光标定位
+         * @formId
+         *          表单ID
+         * @elementName
+         *          光标定位在指点表单元素的name属性的值
+         * @submitFun
+         *          表单提交需执行的任务
+         */
+        $(function () {
+            bindFormEvent("form", "${firstField.javaProperty}", queryGrid);
+            bindFormEvent("_form", "_${firstField.javaProperty}", saveOrUpdate, function (){$('#dlg').dialog('close');});
+            if (document.addEventListener) {
+                document.addEventListener("keyup",getKey,false);
+            } else if (document.attachEvent) {
+                document.attachEvent("onkeyup",getKey);
+            } else {
+                document.onkeyup = getKey;
+            }
+            var pager = $('#grid').datagrid('getPager');    // get the pager of treegrid
+                pager.pagination({
+                    ${"<#"}controls_paginationOpts/>,
+                    buttons:[
+                    {
+                        iconCls:'icon-add',
+                        text:'新增',
+                        handler:function(){
+                            openInsert();
+                        }
+                    },
+                    {
+                        iconCls:'icon-edit',
+                        text:'修改',
+                        handler:function(){
+                            openUpdate();
+                        }
+                    },
+                    {
+                        iconCls:'icon-remove',
+                        text:'删除',
+                        handler:function(){
+                            del();
+                        }
+                    },
+                    {
+                        iconCls:'icon-export',
+                        text:'导出',
+                        handler:function(){
+                            doExport('grid');
+                        }
+                    }
+                ]
+            });
+            //表格仅显示下边框
+            $('#grid').datagrid('getPanel').removeClass('lines-both lines-no lines-right lines-bottom').addClass("lines-bottom");
+            queryGrid();
+        })
+    </script>
+${"</#"}body>

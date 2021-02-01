@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <properties resource="generator/sharp-generator-config.properties"/>
+
+    <context id="Mysql" targetRuntime="MyBatis3Simple" defaultModelType="flat">
+
+        <!-- Mapper插件 -->
+        <!-- mappers属性为*Mapper.java要继承的接口全名 -->
+        <plugin type="${mapper.plugin}">
+            <property name="mappers" value="com.sa.base.MyMapper"/>
+            <property name="beginningDelimiter" value="`"/>
+            <property name="endingDelimiter" value="`"/>
+            <property name="isDTO" value="true"/>
+        </plugin>
+
+        <!-- Service生成插件 -->
+        <!-- targetProject和targetPackage必填 -->
+        <!--<plugin type="MyServicePlugin">-->
+            <!--<property name="targetProject" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java"></property>-->
+            <!--<property name="targetPackage" value="com.sa.service"></property>-->
+            <!--&lt;!&ndash; 此配置用于getActualDao方法的返回对象import，需要获取Mapper类的包路径 &ndash;&gt;-->
+            <!--&lt;!&ndash; 如果不配置，则从下面的<javaClientGenerator>标签的targetPackage属性获取 &ndash;&gt;-->
+            <!--&lt;!&ndash; 如果再没有<javaClientGenerator>标签，则根据targetPackage属性减去service加上dao来生成service中mapper的包路径 &ndash;&gt;-->
+            <!--<property name="javaClientTargetPackage" value="com.sa"></property>-->
+            <!--&lt;!&ndash; 如果不配置，则不会在类上继承 &ndash;&gt;-->
+            <!--<property name="serviceSuperClass" value="com.sa.BaseServiceImpl"></property>-->
+            <!--&lt;!&ndash; 如果不配置，则不会在接口上继承 &ndash;&gt;-->
+            <!--<property name="serviceSuperInterface" value="com.sa.BaseService"></property>-->
+        <!--</plugin>-->
+
+        <!-- provider生成插件 -->
+        <!--targetProject和targetPackage必填 -->
+        <!--<plugin type="MyProviderPlugin">-->
+            <!--<property name="targetProject" value="d:/tpl"></property>-->
+            <!--<property name="targetPackage" value="com.sa.provider"></property>-->
+            <!--&lt;!&ndash; 如果tableName属性存在，则会根据value中的数据库表名生成提供者 &ndash;&gt;-->
+            <!--&lt;!&ndash; 字段为id,provider_name,value,text,order_number &ndash;&gt;-->
+            <!--<property name="tableName" value="mbg_provider"></property>-->
+        <!--</plugin>-->
+
+        <!-- Controller生成插件 -->
+        <!-- targetProject和targetPackage必填 -->
+        <!--<plugin type="MyControllerPlugin">-->
+            <!--<property name="targetProject" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java"></property>-->
+            <!--<property name="targetPackage" value="com.sa.controller"></property>-->
+            <!--&lt;!&ndash; 如果不配置，则不会在类上继承 &ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="controllerSuperClass" value="com.sa.BaseControllerImpl"></property>&ndash;&gt;-->
+            <!--&lt;!&ndash; 如果不配置，则不会在接口上继承 &ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="controllerSuperInterface" value="com.sa.BaseController"></property>&ndash;&gt;-->
+        <!--</plugin>-->
+
+        <!-- Mybatis配置文件生成插件 -->
+        <!-- targetProject和targetPackage必填 -->
+        <!-- fileName不填默认为mybatis-config.xml -->
+        <!--<plugin type="com.sa.MyMapperConfigPlugin">-->
+            <!--<property name="targetProject" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/resources/"></property>-->
+            <!--<property name="targetPackage" value="/"></property>-->
+            <!--<property name="fileName" value="mybatis-config.xml" />-->
+        <!--</plugin>-->
+
+        <!-- 根据beetl模板文件生成代码插件 -->
+        <!-- targetDir和templateRootDir必填 -->
+        <!-- overwrite属性默认为false，这里无法获取maven plugin中配置的overwrite属性，需要单独解析 -->
+        <plugin type="com.sa.mbg.beetl.BeetlTemplatesPlugin">
+            <property name="targetDir" value="d:/tpl"></property>
+            <property name="templateRootDir" value="E:/workspace/dili-workspace/ms-workspace/sharp-sword-parent/ss-mbg/mbg-templates"></property>
+            <property name="basePackage" value="com.sa${appName}" />
+            <property name="basePackage_dir" value="com/sa/${appName}/" />
+            <property name="overwrite" value="true" />
+            <property name="appName" value="${appName}"/>
+            <property name="projectName" value="${projectName}"/>
+        </plugin>
+
+        <commentGenerator type="org.mybatis.generator.internal.DefaultCommentGenerator">
+            <!--**阻止**生成注释，默认为false-->
+            <property name="suppressAllComments" value="false"/>
+            <!--**阻止**生成的注释包含时间戳，默认为false-->
+            <property name="suppressDate" value="false"/>
+        </commentGenerator>
+
+        <jdbcConnection driverClass="${jdbc.driverClass}"
+                        connectionURL="${jdbc.url}"
+                        userId="${jdbc.user}"
+                        password="${jdbc.password}">
+        </jdbcConnection>
+
+        <javaModelGenerator targetPackage="com.sa${appName}.domain" targetProject="d:/tpl"/>
+        <!--<javaModelGenerator targetPackage="com.sa.domain.mbg" targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java"/>-->
+
+        <!--<sqlMapGenerator targetPackage="mapper"  targetProject="d:/tpl"/>-->
+        <!--<javaClientGenerator targetPackage="com.sa${appName}.dao" targetProject="d:/tpl" type="XMLMAPPER" />-->
+
+        <!--<sqlMapGenerator targetPackage="mapper"  targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/resources"/>-->
+        <!--<javaClientGenerator targetPackage="com.sa" targetProject="E:/workspace/dili-workspace/ms-workspace/sharp-sword/src/main/java" type="XMLMAPPER" />-->
+
+        <table tableName="orders" >
+            <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
+        </table>
+        <!--<table domainObjectName="ScheduleJob" tableName="mbg_provider">-->
+            <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
+        <!--</table>-->
+        <!--<table domainObjectName="Person" tableName="person">-->
+            <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
+        <!--</table>-->
+    </context>
+</generatorConfiguration>

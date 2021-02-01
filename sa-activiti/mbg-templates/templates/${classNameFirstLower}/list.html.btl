@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    模板变量table信息参见:org.mybatis.generator.api.IntrospectedTable<br/>
+    类名首字母小写:${classNameFirstLower}<br/>
+    类名:${className}<br/>
+    表名:${table.fullyQualifiedTable.introspectedTableName}<br/>
+    表注释:${table.remarks}<br/>
+    实体对象名:${table.fullyQualifiedTable.domainObjectName}<br/>
+    列信息:<br/>
+    获取指定id列JDBC类型:${@java.sql.JDBCType.valueOf( @table.getColumn("id").getJdbcType())}<br/>
+    所有列:
+    <% for(var i=0; i<table.allColumns.~size;i++){
+        var data = table.allColumns[i];
+    %>
+        actualColumnName:String:${data.actualColumnName},
+        javaProperty:String:${data.javaProperty},
+        defaultValue:String:${data.defaultValue},
+        remarks:String:${data.remarks},
+        length:int:${data.length},
+        nullable:boolean:${data.nullable},
+        identity:boolean:${data.identity},
+        tableAlias:String:${data.tableAlias},
+        jdbcTypeName:String:${data.jdbcTypeName},
+        scale:int:${data.scale},
+        jdbcTypeName:String:${data.jdbcTypeName},
+        jdbcType:int:${data.jdbcType}:${@java.sql.JDBCType.valueOf( data.jdbcType)}
+        ===========================================================================
+    <%}%>
+</body>
+</html>

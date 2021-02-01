@@ -1,0 +1,7 @@
+RESOURCE.root=
+RESOURCE.autoCheck=true
+RESOURCE.tagRoot=templates/htmltag
+RESOURCE.tagSuffix=tag
+HTML_TAG_FLAG=#
+TAG.htmltag=HTMLTag
+TAG.htmltagvar=HTMLVarBindingTag

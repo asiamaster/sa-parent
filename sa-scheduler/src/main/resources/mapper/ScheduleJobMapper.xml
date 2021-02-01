@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sa.quartz.dao.ScheduleJobMapper">
+  <resultMap id="BaseResultMap" type="com.sa.quartz.domain.ScheduleJob">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="created" jdbcType="TIMESTAMP" property="created" />
+    <result column="modified" jdbcType="TIMESTAMP" property="modified" />
+    <result column="job_name" jdbcType="VARCHAR" property="jobName" />
+    <result column="job_group" jdbcType="VARCHAR" property="jobGroup" />
+    <result column="job_status" jdbcType="INTEGER" property="jobStatus" />
+    <result column="job_data" jdbcType="VARCHAR" property="jobData" />
+    <result column="cron_expression" jdbcType="VARCHAR" property="cronExpression" />
+    <result column="repeat_interval" jdbcType="INTEGER" property="repeatInterval" />
+    <result column="start_delay" jdbcType="INTEGER" property="startDelay" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="bean_class" jdbcType="VARCHAR" property="beanClass" />
+    <result column="spring_id" jdbcType="VARCHAR" property="springId" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="is_concurrent" jdbcType="INTEGER" property="isConcurrent" />
+    <result column="method_name" jdbcType="VARCHAR" property="methodName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    id, created, modified, job_name, job_group, job_status, job_data, cron_expression, 
+    repeat_interval, start_delay, description, bean_class, spring_id, url, is_concurrent, 
+    method_name
+  </sql>
+
+</mapper>

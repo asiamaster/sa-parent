@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <properties resource="generator/generator-config.properties"/>
+
+    <context id="Mysql" targetRuntime="MyBatis3" defaultModelType="flat">
+        <!-- 生成的Java文件的编码 -->
+        <property name="javaFileEncoding" value="UTF-8"/>
+        <!-- 格式化java代码 -->
+        <property name="javaFormatter" value="org.mybatis.generator.api.dom.DefaultJavaFormatter"/>
+        <!-- 格式化XML代码 -->
+        <property name="xmlFormatter" value="org.mybatis.generator.api.dom.DefaultXmlFormatter"/>
+
+        <!-- Mapper插件 -->
+        <!-- mappers属性为*Mapper.java要继承的接口全名 -->
+        <plugin type="\${mapper.plugin}">
+            <property name="beginningDelimiter" value="`"/>
+            <property name="endingDelimiter" value="`"/>
+            <property name="mappers" value="\${mapper.Mapper}"/>
+            <property name="isDTO" value="true"/>
+        </plugin>
+
+        <!-- Mybatis配置文件生成插件 -->
+        <!-- targetProject和targetPackage必填 -->
+        <!-- fileName不填默认为mybatis-config.xml -->
+        <!--<plugin type="\${myMapperConfig.Plugin}">-->
+            <!--<property name="targetProject" value="\${targetResourcesProject}"></property>-->
+            <!--<property name="targetPackage" value="/"></property>-->
+            <!--<property name="fileName" value="mybatis-config.xml" />-->
+        <!--</plugin>-->
+
+        <!-- Service生成插件 -->
+        <!-- targetProject和targetPackage必填 -->
+        <!--<plugin type="\${myService.Plugin}">-->
+            <!--<property name="targetProject" value="\${targetJavaProject}"></property>-->
+            <!--<property name="targetPackage" value="\${targetServicePackage}"></property>-->
+            <!--&lt;!&ndash; 如果不配置，则不会在类上继承 &ndash;&gt;-->
+            <!--<property name="serviceSuperClass" value="BaseServiceImpl"></property>-->
+            <!--&lt;!&ndash; 如果不配置，则不会在接口上继承 &ndash;&gt;-->
+            <!--<property name="serviceSuperInterface" value="BaseService"></property>-->
+        <!--</plugin>-->
+
+        <!-- provider生成插件 -->
+        <!--targetProject和targetPackage必填 -->
+        <!--<plugin type="\${myProvider.Plugin}">-->
+            <!--<property name="targetProject" value="\${targetJavaProject}"></property>-->
+            <!--<property name="targetPackage" value="\${targetProviderPackage}"></property>-->
+        <!--</plugin>-->
+
+        <!-- Controller生成插件 -->
+        <!-- targetProject和targetPackage必填 -->
+        <!--<plugin type="\${myController.Plugin}">-->
+            <!--<property name="targetProject" value="\${targetJavaProject}"></property>-->
+            <!--<property name="targetPackage" value="\${targetControllerPackage}"></property>-->
+            <!--&lt;!&ndash; 如果不配置，则不会在类上继承 &ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="controllerSuperClass" value="com.sa.base.BaseControllerImpl"></property>&ndash;&gt;-->
+            <!--&lt;!&ndash; 如果不配置，则不会在接口上继承 &ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="controllerSuperInterface" value="com.sa.base.BaseController"></property>&ndash;&gt;-->
+        <!--</plugin>-->
+
+        <!-- beetl模板文件生成插件 -->
+        <!--<plugin type="BeetlTemplatesPlugin">-->
+            <!--<property name="targetDir" value="\${targetResourcesProject}"></property>-->
+            <!--<property name="templateRootDir" value="\${templateRootDir}"></property>-->
+            <!--<property name="basePackage_dir" value="com/dili/utils" />-->
+            <!--<property name="overwrite" value="true" />-->
+        <!--</plugin>-->
+
+        <commentGenerator type="org.mybatis.generator.internal.DefaultCommentGenerator">
+            <!--**阻止**生成注释，默认为false-->
+            <property name="suppressAllComments" value="false"/>
+            <!--**阻止**生成的注释包含时间戳，默认为false-->
+            <property name="suppressDate" value="false"/>
+        </commentGenerator>
+
+        <jdbcConnection driverClass="\${jdbc.driverClass}"
+                        connectionURL="\${jdbc.url}"
+                        userId="\${jdbc.user}"
+                        password="\${jdbc.password}">
+        </jdbcConnection>
+
+        <!-- 默认false，把JDBC DECIMAL 和 NUMERIC 类型解析为 Integer，为 true时把JDBC DECIMAL 和
+                    NUMERIC 类型解析为java.math.BigDecimal -->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="true"/>
+            <!-- This property is used to specify whether MyBatis Generator should force the use of JSR-310 data types for DATE, TIME,
+            and TIMESTAMP fields, rather than using java.util.Date -->
+            <property name="useJSR310Types" value="true"/>
+        </javaTypeResolver>
+
+        <javaModelGenerator targetPackage="\${targetModelPackage}" targetProject="\${targetJavaProject}"/>
+
+        <sqlMapGenerator targetPackage="\${targetXMLPackage}"  targetProject="\${targetResourcesProject}"/>
+
+        <javaClientGenerator targetPackage="\${targetMapperPackage}" targetProject="\${targetJavaProject}" type="XMLMAPPER" />
+
+        <!-- 生成所有表模型 -->
+        <table tableName="%">
+            <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
+        </table>
+        <!-- 生成指定表模型 -->
+        <!--<table domainObjectName="Person" tableName="person">-->
+            <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
+        <!--</table>-->
+    </context>
+</generatorConfiguration>

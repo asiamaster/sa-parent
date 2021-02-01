@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.a</groupId>
+	<artifactId>${projectName}-parent</artifactId>
+	<name>${projectName}-parent</name>
+	<version>1.0.0-SNAPSHOT</version>
+	<!--<version>1.0.0.RELEASE</version>-->
+	<description>父项目</description>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>${projectName}</module>
+	</modules>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<!-- MyBatis Generator -->
+		<!-- Java接口和实体类 -->
+		<targetJavaProject>\${basedir}/src/main/java</targetJavaProject>
+		<targetMapperPackage>com.sa${appName}.mapper</targetMapperPackage>
+		<targetModelPackage>com.sa${appName}.domain</targetModelPackage>
+		<targetServicePackage>com.sa${appName}.service</targetServicePackage>
+		<targetProviderPackage>com.sa${appName}.provider</targetProviderPackage>
+		<targetControllerPackage>com.sa${appName}.controller</targetControllerPackage>
+		<templateRootDir>\${basedir}/mbg-templates</templateRootDir>
+		<projectdir>\${basedir}</projectdir>
+		<!-- XML生成路径 -->
+		<targetResourcesProject>\${basedir}/src/main/resources</targetResourcesProject>
+		<targetXMLPackage>mapper</targetXMLPackage>
+		<!-- 依赖版本 -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<springloaded.version>1.2.8.RELEASE</springloaded.version>
+		<mapper.version>3.3.9</mapper.version>
+		<mysql.version>5.1.38</mysql.version>
+		<sharp-sword.version>3.6.0-SNAPSHOT</sharp-sword.version>
+	</properties>
+
+	<!-- 注意： 这里必须要添加， 否者各种依赖有问题  -->
+	<repositories>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/libs-milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<!--地利 -->
+	<distributionManagement>
+		<repository>
+			<id>central</id>
+			<name>Artifactory Release Repository</name>
+			<url>
+                http://mvn2.diligrp.com/artifactory/libs-release-local
+            </url>
+		</repository>
+		<snapshotRepository>
+			<id>central</id>
+			<name>Artifactory Snapshot Repository</name>
+			<url>
+                http://mvn2.diligrp.com/artifactory/libs-snapshot-local
+            </url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<profiles>
+		<profile>
+			<id>local</id>
+			<properties>
+				<build.profile.id>local</build.profile.id>
+			</properties>
+		</profile>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<build.profile.id>dev</build.profile.id>
+			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+			<properties>
+				<build.profile.id>test</build.profile.id>
+			</properties>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<build.profile.id>prod</build.profile.id>
+			</properties>
+		</profile>
+	</profiles>
+
+	<build>
+		<!-- 资源文件过滤 -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<!-- 编译JDK版本 -->
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!--<plugin> -->
+			<!--<groupId>org.apache.maven.plugins</groupId> -->
+			<!--<artifactId>maven-surefire-plugin</artifactId> -->
+			<!--<version>2.6</version> -->
+			<!--<configuration> -->
+			<!--<skipTests>true</skipTests> -->
+			<!--</configuration> -->
+			<!--</plugin> -->
+			<plugin>
+				<groupId>org.mybatis.generator</groupId>
+				<artifactId>mybatis-generator-maven-plugin</artifactId>
+				<version>1.3.7</version>
+				<configuration>
+					<configurationFile>\${basedir}/src/main/resources/generator/generatorConfig.xml</configurationFile>
+					<overwrite>true</overwrite>
+					<verbose>true</verbose>
+				</configuration>
+				<dependencies>
+				    <dependency>
+                        <groupId>com.a</groupId>
+                        <artifactId>ss-mbg</artifactId>
+                        <version>\${sharp-sword.version}</version>
+                    </dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<!-- Import dependency management from Spring Boot -->
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>2.1.0.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<!-- Spring Boot 1.3.x and Spring Framework 4.2.x support -->
+			<!--<dependency>-->
+				<!--<groupId>org.springframework.cloud</groupId>-->
+				<!--<artifactId>spring-cloud-dependencies</artifactId>-->
+				<!--&lt;!&ndash;<version>Brixton.RELEASE</version>&ndash;&gt;-->
+				<!--<version>Finchley.M8</version>-->
+				<!--<type>pom</type>-->
+				<!--<scope>import</scope>-->
+			<!--</dependency>-->
+		</dependencies>
+	</dependencyManagement>
+
+
+</project>

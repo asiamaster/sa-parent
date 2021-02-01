@@ -1,0 +1,24 @@
+spring.profiles.active=\${build.profile.id}
+#swagger请求的根路径
+springfox.documentation.swagger.v2.host=${appName}.brtc.com
+#swagger文档地址
+springfox.documentation.swagger.v2.path=/swagger/api-docs
+
+
+#redis
+#redis.enable=true
+#beetl
+beetl.enable=true
+quartz.enabled=false
+#freemarker
+#freemarker.enable=true
+#swagger:http://host:port/swagger-ui.html
+swagger.enable=true
+swagger.basePackage=com.sa${appName}.controller
+#druid监控
+druidFilter.enable=true
+#mongodb
+#mongodb.enable=true
+#web配置,listener, filter, servlet
+web.enable=true
+web.instanceResolver=true

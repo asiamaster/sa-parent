@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration >
+    <!--<include resource="org/springframework/boot/logging/logback/base.xml"/>-->
+
+    <!-- 文件输出格式 -->
+    <property name="PATTERN" value="[${appName}-dev]%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n" />
+
+    <!-- 开发环境 -->
+    <springProfile name="dev">
+        <appender name="appender" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>\${PATTERN}</pattern>
+            </encoder>
+        </appender>
+        <logger name="org.springframework.web" level="INFO"/>
+        <logger name="com.sa${appName}" level="DEBUG"/>
+
+    </springProfile>
+
+    <!-- 测试环境 -->
+    <springProfile name="test">
+        <appender name="appender" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>[${appName}-test]%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n</pattern>
+            </encoder>
+        </appender>
+        <!-- 每天产生一个文件 -->
+        <appender name="fileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <!-- 文件路径 -->
+            <!--<file>D:/logs-test</file>-->
+            <!--<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+                <!--&lt;!&ndash; 文件名称 &ndash;&gt;-->
+                <!--<fileNamePattern>D:/logs-test/info.%d{yyyy-MM-dd}.log</fileNamePattern>-->
+                <!--&lt;!&ndash; 文件最大保存历史数量 &ndash;&gt;-->
+                <!--<MaxHistory>100</MaxHistory>-->
+            <!--</rollingPolicy>-->
+
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>+++%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n</pattern>
+            </layout>
+        </appender>
+        <logger name="org.springframework.web" level="INFO"/>
+        <logger name="com.sa${appName}" level="INFO"/>
+    </springProfile>
+
+    <root level="info">
+        <appender-ref ref="appender" />
+    </root>
+</configuration>

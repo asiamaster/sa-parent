@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>document</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <meta name="author" content="Teaism">
+    <link rel="stylesheet" href="" />
+    <style>
+
+        .error-page {
+            position: absolute;
+            top: 100px;
+            width: 450px;
+            margin-left: 12%;
+        }
+        .dili-logo-pic {
+            width: 150px;
+            height: auto;
+        }
+        .error-pic-show {
+            position: fixed;
+            bottom: 8%;
+            right: 10%;
+        }
+        .error-pic-rb {
+            width: 90%;
+        }
+        @media screen and (max-width: 1366px) {
+            .error-page {
+                top: 50px;
+            }
+            .error-pic-show {
+                right: 2%;
+                bottom: 5%;
+            }
+            .error-pic-rb {
+                width: 60%;
+            }
+        }
+
+
+        .error-detail {
+            display: none;
+        }
+        /* .show {
+            display: block;
+        }  */
+    </style>
+</head>
+<body>
+
+<div class="error-page">
+    <div class="dili-logo">
+        <img class="dili-logo-pic" src="${contextPath}/common/image/dili-logo.png" alt="">
+    </div>
+    <div class="error-des">
+        <h3>报错了-_-!&nbsp;&nbsp;您可以:&nbsp;&nbsp;<a href="#" onclick="history.go(-1)">返回上一页</a>&nbsp;&nbsp;<#config has="error.page.indexPage">|&nbsp;&nbsp;<a href="#" onclick="location.href='<#config name="error.page.indexPage"/>'" class="primary-btn dili-btn">去网站首页</a></#config></h3>
+        <a href="#" class="error-more-btn">更多</a>
+        <% if(has(exMsg)){%>
+        <p class="error-detail">${exMsg}</p>
+        <%}%>
+        <p class="error-detail">${@com.sa.util.ExceptionUtils.getExceptionString(exception, 2000)}</p>
+    </div>
+    <div class="error-pic-show">
+        <img src="${contextPath}/common/image/error-pic.jpg" alt="" class="error-pic-rb">
+    </div>
+</div>
+
+</body>
+<script type="text/javascript" src="${contextPath}/common/js/jquery-3.2.1.min.js"></script>
+<script>
+    $('.error-more-btn').on('click', function(){
+        $('.error-detail').toggle();
+    })
+</script>
+</html>
