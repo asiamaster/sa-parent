@@ -89,7 +89,7 @@ $.fn.serializeObject = function (containsNull) {
 };
 
 //从后台获取原始值的key的前缀
-var orginal_key_prefix = '${@com.sa.ss.metadata.ValueProviderUtils.ORIGINAL_KEY_PREFIX}';
+var orginal_key_prefix = '${@com.sa.metadata.ValueProviderUtils.ORIGINAL_KEY_PREFIX}';
 
 //获取datagrid行数据中的原始值(有orginal_key_prefix开头的key的值)，用于form load
 function getOriginalData(json) {
