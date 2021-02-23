@@ -325,8 +325,8 @@ public abstract class BaseServiceAdaptor<T extends IDomain, KEY extends Serializ
 		}
 		IMybatisForceParams iMybatisForceParams =((IMybatisForceParams) domain);
 
-		Set<String> columnsSet = iMybatisForceParams.getSelectColumns();
-		if(columnsSet == null|| columnsSet.isEmpty()){
+		Set<String> selectColumns = iMybatisForceParams.getSelectColumns();
+		if(selectColumns == null|| selectColumns.isEmpty()){
 			return exampleExpand;
 		}
 		Boolean checkInjection = iMybatisForceParams.getCheckInjection();
@@ -339,7 +339,7 @@ public abstract class BaseServiceAdaptor<T extends IDomain, KEY extends Serializ
 			try {
 				Field selectColumnsField = Example.class.getDeclaredField("selectColumns");
 				selectColumnsField.setAccessible(true);
-				selectColumnsField.set(exampleExpand, columnsSet);
+				selectColumnsField.set(exampleExpand, selectColumns);
 			} catch (NoSuchFieldException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
@@ -348,7 +348,7 @@ public abstract class BaseServiceAdaptor<T extends IDomain, KEY extends Serializ
 			return exampleExpand;
 		} else {
 			ExampleExpand.Builder builder = new Example.Builder(entityClass);
-			builder.select(columnsSet.toArray(new String[]{}));
+			builder.select(selectColumns.toArray(new String[]{}));
 			ExampleExpand exampleExpand1 = ExampleExpand.of(entityClass, builder);
 
 			if(StringUtils.isNotBlank(iMybatisForceParams.getWhereSuffixSql())){
@@ -357,7 +357,6 @@ public abstract class BaseServiceAdaptor<T extends IDomain, KEY extends Serializ
 			return exampleExpand1;
 		}
 	}
-
 
 	@Override
 	public List<T> listByExample(T domain){
@@ -381,7 +380,6 @@ public abstract class BaseServiceAdaptor<T extends IDomain, KEY extends Serializ
 		}
 		return getDao().selectByExampleExpand(example);
 	}
-
 
 	@Override
 	public BasePage<T> listPageByExample(T domain){
