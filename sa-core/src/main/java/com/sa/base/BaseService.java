@@ -76,6 +76,7 @@ public interface BaseService<T,KEY extends Serializable> {
 
 	List<T> selectByExample(Object example);
 
+	T selectByPrimaryKey(KEY key);
 
 	List<T> listByExample(T domain);
 
